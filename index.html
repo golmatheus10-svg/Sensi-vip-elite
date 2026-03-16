@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SENSI PRO ULTIMATE - FUTURISTA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- ESTILO FUTURISTA CHAMA TIVO (PRETO E VERMELHO) --- */
+        :root {
+            --primary: #ff0000;
+            --primary-dark: #cc0000;
+            --bg-dark: #050505;
+            --card-bg: #111111;
+            --text-white: #ffffff;
+            --text-gray: #a0a0a0;
+            --shadow-red: 0 0 20px rgba(255, 0, 0, 0.6);
+            --shadow-gold: 0 0 20px rgba(255, 215, 0, 0.5);
+            --vip-gold: #ffdf00;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- TELA DE LOGIN --- */
+        #login-screen {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 20px;
+            border: 3px solid var(--primary);
+            box-shadow: var(--shadow-red);
+            text-align: center;
+            width: 340px;
+            z-index: 100;
+            display: block; /* Mostra no início */
+        }
+
+        .login-header i { font-size: 60px; color: var(--primary); margin-bottom: 15px; text-shadow: var(--shadow-red); }
+        .login-header h2 { text-transform: uppercase; margin: 0 0 25px 0;}
+
+        .input-group { margin: 20px 0; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); font-size: 12px;}
+        
+        input {
+            width: 100%; padding: 14px; border: 2px solid var(--primary); background: transparent;
+            color: white; border-radius: 8px; box-sizing: border-box; font-size: 16px;
+        }
+        input:focus { outline: none; box-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
+
+        .btn-main {
+            background: var(--primary); color: white; border: none; padding: 16px; width: 100%;
+            font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s;
+            border-radius: 8px; font-size: 16px;
+        }
+        .btn-main:hover { background: var(--primary-dark); box-shadow: var(--shadow-red); transform: scale(1.02); }
+
+        #login-error { color: #ff3333; display: none; margin-top: 15px; font-weight: bold; font-size: 14px; text-shadow: 0 0 5px #ff3333; }
+
+        /* --- PAINÉIS (PADRÃO) --- */
+        .panel {
+            display: none; width: 100%; max-width: 460px; background: var(--bg-dark);
+            padding: 25px; box-sizing: border-box; border-radius: 20px;
+            position: relative; margin: 20px;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; border-bottom: 3px solid var(--primary); margin-bottom: 25px;
+            text-shadow: var(--shadow-red);
+        }
+        .header h2 { margin: 0; }
+        .header i { color: var(--primary); font-size: 35px; }
+
+        /* Grade de Ferramentas */
+        .grid-tools {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;
+        }
+        .tool-card {
+            background: var(--card-bg); padding: 15px; border-radius: 12px;
+            text-align: center; border: 1px solid #333; cursor: pointer; font-size: 11px;
+            font-weight: bold; transition: 0.2s;
+        }
+        .tool-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: 0 0 10px rgba(255, 0, 0, 0.3); }
+        .tool-card i { color: var(--primary); font-size: 26px; margin-bottom: 8px; display: block; text-shadow: var(--shadow-red); }
+        .tool-card span { color: var(--text-gray); }
+
+        /* Card do Gerador */
+        .card-box {
+            background: var(--card-bg); border-radius: 18px; padding: 25px;
+            border: 2px solid var(--primary); margin-bottom: 25px; position: relative;
+        }
+        .card-box h3 { color: var(--primary); text-transform: uppercase; margin-top: 0; text-shadow: var(--shadow-red); }
+
+        /* --- ANIMAÇÃO DE ESCANEAMENTO (Barra de Laser) --- */
+        #scan-overlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); border-radius: 18px; flex-direction: column;
+            align-items: center; justify-content: center; z-index: 10;
+        }
+        .scanner-bar {
+            width: 85%; height: 6px; background: var(--primary);
+            box-shadow: var(--shadow-red); animation: scanMove 1.5s infinite linear;
+        }
+        @keyframes scanMove { 0% { transform: translateY(-60px); opacity: 1; } 50% { opacity: 1; } 100% { transform: translateY(60px); opacity: 1; } }
+        .scan-text { color: white; margin-top: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Resultados da Sensibilidade */
+        .res-box {
+            background: #1a1a1a; padding: 20px; border-left: 5px solid var(--primary);
+            margin-top: 15px; display: none; border-radius: 8px;
+        }
+        .sensi-line { margin-bottom: 10px; font-size: 14px; }
+        .sensi-line strong { color: white; }
+        .sensi-type { color: var(--primary-dark); font-weight: bold; display: block; margin-bottom: 4px; }
+
+        /* --- PAINEL VIP (ESPECÍFICO - DOURADO) --- */
+        #vip-panel { border: 3px solid var(--vip-gold); box-shadow: var(--shadow-gold); background: #080808; }
+        #vip-panel .header { border-bottom-color: var(--vip-gold); text-shadow: var(--shadow-gold); }
+        #vip-panel h2 { color: var(--vip-gold); }
+        #vip-panel select, #vip-panel input { border-color: var(--vip-gold); background: #1a1a1a; color: white; }
+        #vip-panel input:focus { box-shadow: 0 0 10px rgba(255, 215, 0, 0.8); }
+        #vip-panel .btn-main { background: var(--vip-gold); color: black; }
+        #vip-panel .btn-main:hover { background: #e6c300; box-shadow: var(--shadow-gold); }
+        #vip-panel .tool-card i { color: var(--vip-gold); text-shadow: var(--shadow-gold); }
+        #vip-panel .tool-card:hover { border-color: var(--vip-gold); }
+        #vip-panel .res-box { border-left-color: var(--vip-gold); background: #222; }
+        #vip-panel .sensi-type { color: #b8860b; }
+
+        /* Portão VIP no Painel Principal */
+        .card-vip-gate { border-radius: 18px; padding: 20px; margin: 0 0 25px 0; border: 2px solid var(--vip-gold); background: #1a1500; text-align: center; }
+        .card-vip-gate h3 { color: var(--vip-gold); text-transform: uppercase; margin-top: 0; text-shadow: var(--shadow-gold); }
+        .input-vip { width: 100%; padding: 12px; border: 2px solid var(--vip-gold); background: transparent; color: white; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px;}
+
+        /* --- JANELA DE CHAT DA IA (VISUAL - ESTILO IMAGEM REFERÊNCIA) --- */
+        #chat-container {
+            display: none; /* Esconde inicialmente */
+            position: fixed;
+            bottom: 95px; /* Acima do ícone flutuante */
+            right: 25px;
+            width: 320px;
+            height: 480px;
+            background: var(--card-bg);
+            border: 3px solid var(--primary);
+            border-radius: 18px;
+            box-shadow: var(--shadow-red);
+            z-index: 1000;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Cabeçalho do Chat */
+        .chat-header {
+            background: var(--primary);
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .chat-header-info { display: flex; align-items: center; gap: 10px; }
+        .chat-header img { width: 35px; height: 35px; border-radius: 50%; border: 2px solid white; }
+        .chat-header span { font-weight: bold; color: white; font-size: 14px; text-transform: uppercase; }
+        .chat-header button { background: none; border: none; color: white; font-size: 20px; cursor: pointer; font-weight: bold;}
+
+        /* Área de Mensagens */
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(0,0,0,0.3);
+        }
+        /* Bolha Genérica */
+        .message { padding: 12px; border-radius: 15px; max-width: 85%; font-size: 13px; line-height: 1.4; position: relative;}
+        
+        /* Mensagem da IA (Esquerda - Cinza Escuro) */
+        .message-ia { align-self: flex-start; background: #222; color: #ddd; border-radius: 15px 15px 15px 0; border: 1px solid #333; }
+        
+        /* Mensagem do Usuário (Direita - Vermelho) */
+        .message-user { align-self: flex-end; background: var(--primary); color: white; border-radius: 15px 15px 0 15px; box-shadow: 0 0 10px rgba(255,0,0,0.3);}
+
+        /* Campo de Digitação */
+        .chat-input-area {
+            padding: 12px;
+            border-top: 2px solid var(--primary);
+            display: flex;
+            gap: 8px;
+            background: var(--card-bg);
+        }
+        .chat-input-area input {
+            flex: 1; padding: 10px; background: transparent; border: 1px solid var(--primary); color: white; border-radius: 8px; font-size: 14px; outline: none;
+        }
+        .chat-input-area button { background: var(--primary); border: none; color: white; padding: 10px 15px; border-radius: 8px; cursor: pointer;}
+
+        /* --- ÍCONES FLUTUANTES (Suporte e Engrenagem) --- */
+        .floating-icon { position: fixed; bottom: 25px; background: var(--primary); color: white; padding: 20px; border-radius: 50%; cursor: pointer; font-size: 20px; box-shadow: var(--shadow-red); z-index: 90; transition: 0.3s; }
+        #ia-support { right: 25px; }
+        #settings-gear { left: 25px; color: var(--text-gray); background: none; box-shadow: none; font-size: 24px; padding: 10px;}
+        #ia-support:hover { transform: scale(1.1); }
+        #settings-gear:hover { color: var(--primary); transform: rotate(90deg); }
+
+        /* Mensagens de Limpeza Chamatívas */
+        .clean-msg { font-weight: bold; color: #00ff00; text-shadow: 0 0 8px #00ff00; }
+
+        @media (max-width: 480px) { .panel { border-radius: 0; max-width: 100%; margin: 0; padding: 15px;} .grid-tools { gap: 10px; } .tool-card { padding: 12px 8px; font-size: 10px;} #chat-container { width: 100%; max-width: 100%; bottom: 0; right: 0; border-radius: 0; height: 100%; z-index: 1001; }}
+
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-header">
+            <i class="fas fa-shield-alt"></i>
+            <h2>SYSTEM ACCESS</h2>
+        </div>
+        <div class="input-group">
+            <label>OPERATOR ID:</label>
+            <input type="text" id="user" placeholder="LOGIN (777)">
+        </div>
+        <div class="input-group">
+            <label>ACCESS KEY:</label>
+            <input type="password" id="pass" placeholder="PASSWORD">
+        </div>
+        <button class="btn-main" onclick="entrar()">AUTHENTICATE</button>
+        <p id="login-error">ACCESS DENIED: INVALID CREDENTIALS</p>
+    </div>
+
+    <div id="main-app" class="panel">
+        <div class="header">
+            <h2>SENSI <span style="color:var(--primary)">ULTIMATE</span></h2>
+            <i class="fas fa-network-wired"></i>
+        </div>
+
+        <div class="grid-tools">
+            <div class="tool-card" onclick="simularLimpeza('Cache')"><i class="fas fa-broom"></i><span>CLEAN CACHE</span></div>
+            <div class="tool-card" onclick="simularLimpeza('RAM')"><i class="fas fa-microchip"></i><span>OPTIMIZE RAM</span></div>
+            <div class="tool-card" onclick="alert('HUD CÓDIGO: 7122-9011-34')"><i class="fas fa-crosshairs"></i><span>HUDS PRO</span></div>
+            <div class="tool-card" onclick="window.location.reload()"><i class="fas fa-power-off"></i><span>REBOOT</span></div>
+        </div>
+
+        <div class="banner-info" style="background: var(--primary); color: white; padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; font-size: 14px; margin-bottom: 20px;">👑 OPERANDO EM NÍVEL CRITICAL 👑</div>
+
+        <div class="card-box">
+            <div id="scan-overlay">
+                <div class="scanner-bar"></div>
+                <p class="scan-text">SCANNING DEVICE HARDWARE...</p>
+            </div>
+            <h3>ANALYZER V1</h3>
+            <p style="font-size:12px; color:var(--text-gray); margin-bottom:15px;">Selecione ou pesquise para gerar sensibilidades (80-200)</p>
+            
+            <div class="input-group" style="margin-top:0;">
+                <label>Pesquisar Modelo:</label>
+                <input type="text" id="search-model" placeholder="Ex: Galaxy A54, Poco X5...">
+            </div>
+
+            <div class="select-group" style="margin-bottom:15px;">
+                <label style="color:var(--primary); font-size:12px; font-weight:bold;">Ou selecione a marca:</label>
+                <select id="main-brand" style="width:100%; padding:12px; background:#222; color:white; border:none; border-radius:8px; font-size:14px; font-family:'Orbitron', sans-serif;">
+                    <option value="Samsung">SAMSUNG</option>
+                    <option value="Xiaomi">XIAOMI</option>
+                    <option value="Motorola">MOTOROLA</option>
+                    <option value="Infinix">INFINIX</option>
+                    <option value="Emulador">EMULADOR (PC)</option>
+                    <option value="Mobilador">MOBILADOR</option>
+                </select>
+            </div>
+            
+            <button class="btn-main" onclick="gerarSensi('main')">GENERATE CONFIGS</button>
+            
+            <div id="main-res" class="res-box">
+                </div>
+        </div>
+
+        <div class="card-vip-gate">
+            <h3>VIP ACCESS PORTAL</h3>
+            <input type="password" class="input-vip" id="vippass" placeholder="VIP KEY (727)">
+            <button class="btn-main" style="background:var(--vip-gold); color:black;" onclick="acessarVip()">ENTER VIP ZONE</button>
+        </div>
+    </div>
+
+    <div id="vip-panel" class="panel">
+        <div class="header">
+            <h2>VIP <span style="color:var(--vip-gold)">ZONE</span></h2>
+            <button onclick="voltar()" style="background:none; border:none; color:white; cursor:pointer; font-family:'Orbitron'; font-weight:bold; font-size:12px;">[ BACK ]</button>
+        </div>
+
+        <div class="grid-tools">
+            <div class="tool-card" style="border-color: var(--vip-gold);"><i class="fas fa-crown"></i><span>VIP STATUS</span></div>
+            <div class="tool-card" onclick="simularLimpeza('Vip Optimization')"><i class="fas fa-bolt"></i><span>ULTRA OPTIMIZE</span></div>
+            <div class="tool-card" onclick="alert('VIP HUD: 8812-3344-99')"><i class="fas fa-star"></i><span>VIP HUDS</span></div>
+            <div class="tool-card" style="border-color: var(--vip-gold);"><i class="fas fa-server"></i><span>PRO SERVER</span></div>
+        </div>
+
+        <div class="card-box" style="border-color: var(--vip-gold);">
+            <div id="scan-overlay-vip" style="display:none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); border-radius: 18px; flex-direction: column; align-items: center; justify-content: center; z-index: 10;">
+                <div class="scanner-bar" style="background:var(--vip-gold); box-shadow: var(--shadow-gold);"></div>
+                <p class="scan-text" style="color:var(--vip-gold);">ANALYZING PRO DATA PROTOCOLS...</p>
+            </div>
+            <h3>ULTRA ANALYZER VIP</h3>
+            <p style="font-size:12px; color:var(--text-gray); margin-bottom:20px;">Geração baseada em DPI simulada e modelo detalhado.</p>
+            
+            <div class="input-group">
+                <label style="color:var(--vip-gold);">Modelo Detalhado:</label>
+                <input type="text" id="model-vip" placeholder="Ex: Galaxy S23 Ultra, Poco F5 Pro...">
+            </div>
+            
+            <div class="input-group" style="margin-bottom:20px;">
+                <label style="color:var(--vip-gold);">DPI Simulada (Não altera o real):</label>
+                <input type="number" id="dpi-vip" placeholder="Ex: 600" min="300" max="1200">
+            </div>
+
+            <button class="btn-main" style="background:var(--vip-gold); color:black;" onclick="gerarSensi('vip')">GENERATE PRO CONFIGS</button>
+            
+            <div id="vip-res" class="res-box" style="border-color:var(--vip-gold);">
+                </div>
+        </div>
+    </div>
+
+    <div id="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="Bot"> 
+                <span>SENSI I.A</span>
+            </div>
+            <button onclick="toggleIA()">X</button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+            <div class="message message-ia">
+                Olá, sou a Sensi I.A! Com o que posso te ajudar hoje?
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Digite sua dúvida...">
+            <button onclick="enviarMensagem()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="ia-support" class="floating-icon" onclick="toggleIA()"><i class="fas fa-comments"></i></div>
+
+    <div id="settings-gear" class="floating-icon" onclick="mudarSenha()"><i class="fas fa-cog"></i></div>
+
+    <script>
+        /* --- JAVASCRIPT (LÓGICA E REGRAS) --- */
+
+        let senhaAdmin = "mateus"; // Senha principal inicial
+
+        // 1. Sistema de Login Principal (777/mateus)
+        function entrar() {
+            const u = document.getElementById('user').value;
+            const p = document.getElementById('pass').value;
+            const errorMsg = document.getElementById('login-error');
+
+            if(u === "777" && p === senhaAdmin) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+                errorMsg.style.display = 'none';
+                toolSim('Login concluído. Protocolos iniciados!');
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // 2. Acesso ao Painel VIP (Senha: 727)
+        function acessarVip() {
+            const vPass = document.getElementById('vippass').value;
+            if(vPass === "727") {
+                document.getElementById('main-app').style.display = 'none';
+                document.getElementById('vip-panel').style.display = 'block';
+                toolSim('VIP Secure Zone access granted!');
+            } else {
+                alert("SENHA VIP INCORRETA! Tente 727.");
+            }
+        }
+
+        function voltar() {
+            document.getElementById('vip-panel').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+        }
+
+        // 3. Simulação de Limpeza Chamatíva
+        function toolSim(toolName) {
+            alert(`Simulação: ${toolName} concluída. Sistema otimizado!`);
+        }
+
+        function simularLimpeza(tipo) {
+            alert(`SISTEMA: Iniciando protocolo de ${tipo}...`);
+            setTimeout(() => {
+                alert(`CONCLUÍDO: ${tipo} limpo. Sistema operando em nível CRITICAL MAX.`);
+            }, 1000);
+        }
+
+        // 4. Lógica de Geração com Animação de Scanner de Laser (Unificada)
+        function gerarSensi(modo) {
+            const overlayId = modo === 'main' ? 'scan-overlay' : 'scan-overlay-vip';
+            const resId = modo === 'main' ? 'main-res' : 'vip-res';
+            
+            const overlay = document.getElementById(overlayId);
+            const res = document.getElementById(resId);
+
+            // Mostra animação e esconde resultados anteriores
+            overlay.style.display = 'flex';
+            res.style.display = 'none';
+
+            // Simula 2 segundos de escaneamento de laser
+            setTimeout(() => {
+                overlay.style.display = 'none'; // Esconde animação
+                res.style.display = 'block'; // Mostra resultados
+
+                if(modo === 'main') {
+                    generateMainSensiResults();
+                } else {
+                    generateVipSensiResults();
+                }
+                
+            }, 2000); // 2 segundos de animação
+        }
+
+        // Gera 2 sensis diferentes (Alta e Baixa, 80-200) para o Painel Principal
+        function generateMainSensiResults() {
+            const searchModel = document.getElementById('search-model').value;
+            const selectBrand = document.getElementById('main-brand').value;
+            const resultsArea = document.getElementById('main-res');
+            
+            // Define o nome do aparelho com base na pesquisa ou seleção
+            const aparelho = searchModel || selectBrand;
+
+            // Gera números aleatórios entre 80 e 200
+            function randSensi() { return Math.floor(Math.random() * (200 - 80 + 1)) + 80; }
+
+            // Lógica para definir o tamanho do botão (Mobilador/Emulador < Celular)
+            let baseButton = (aparelho === 'Emulador' || aparelho === 'Mobilador') ? 45 : 55;
+            
+            // Sugestão de DPI Genérica
+            let suggestedDpi = Math.floor(Math.random() * (700 - 400 + 1)) + 400;
+
+            resultsArea.innerHTML = `
+                <div class="sensi-line">
+                    <span class="sensi-type">${aparelho} - Config 1 (Média/Alta)</span>
+                    Geral: <strong>${randSensi()}</strong> | Red Dot: <strong>${randSensi()}</strong> | Mira 4x: <strong>${randSensi()-5}</strong> | Botão: <strong>${baseButton}%</strong> | DPI Sugerido: <strong>${suggestedDpi}</strong>
+                </div>
+                <div class="sensi-line" style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">
+                    <span class="sensi-type">${aparelho} - Config 2 (Estável)</span>
+                    Geral: <strong>${randSensi()-30}</strong> | Red Dot: <strong>${randSensi()-20}</strong> | Mira 4x: <strong>${randSensi()-15}</strong> | Botão: <strong>${baseButton+2}%</strong> | DPI Sugerido: <strong>${suggestedDpi-100}</strong>
+                </div>
+            `;
+        }
+
+        // Gera 2 sensis DETALHADAS e Altas para o Painel VIP
+        function generateVipSensiResults() {
+            const modelVip = document.getElementById('model-vip').value || "Genérico Pro";
+            const dpiVip = document.getElementById('dpi-vip').value || "600";
+            const resultsArea = document.getElementById('vip-res');
+
+            // Gera números aleatórios mais altos (150-200) para o VIP
+            function randVip() { return Math.floor(Math.random() * (200 - 150 + 1)) + 150; }
+
+            resultsArea.innerHTML = `
+                <div class="sensi-line">
+                    <span class="sensi-type">VIP Ultra p/ ${modelVip}</span>
+                    Geral: <strong>${randVip()}</strong> | Red Dot: <strong>${randVip()}</strong> | Mira 4x: <strong>${randVip()}</strong> | Botão: <strong>50%</strong>
+                </div>
+                <div class="sensi-line" style="margin-top:10px; border-top:1px solid #444; padding-top:10px;">
+                    <span class="sensi-type">VIP BALANCEADA p/ ${modelVip} (DPI ${dpiVip})</span>
+                    Geral: <strong>${randVip()-20}</strong> | Red Dot: <strong>${randVip()-15}</strong> | Mira 4x: <strong>${randVip()-10}</strong> | Botão: <strong>53%</strong> | Sugerido DPI: <strong>${parseInt(dpiVip)+100}</strong>
+                </div>
+            `;
+        }
+
+        // 5. IA de Suporte Integrada (VISUAL - ESTILO CHAT REAL)
+        
+        // Função para abrir/fechar a janela de chat
+        function toggleIA() {
+            const chat = document.getElementById('chat-container');
+            if (chat.style.display === 'none' || chat.style.display === '') {
+                chat.style.display = 'flex';
+            } else {
+                chat.style.display = 'none';
+            }
+        }
+
+        // Função para enviar e processar mensagens no chat visual
+        function enviarMensagem() {
+            const input = document.getElementById('chat-input');
+            const messagesArea = document.getElementById('chat-messages');
+            
+            if (input.value.trim() === "") return;
+
+            // 1. Adiciona sua mensagem (Lado Direito - Vermelho)
+            const userMsg = document.createElement('div');
+            userMsg.className = 'message message-user';
+            userMsg.innerText = input.value;
+            messagesArea.appendChild(userMsg);
+
+            const pergunta = input.value.toLowerCase();
+            input.value = "";
+
+            // 2. Resposta da IA (Lado Esquerdo - Cinza Escuro) após 1 segundo
+            setTimeout(() => {
+                const iaMsg = document.createElement('div');
+                iaMsg.className = 'message message-ia';
+                
+                // Lógica de resposta "de verdade" simulada
+                if(pergunta.includes("sensi") || pergunta.includes("gerar")) {
+                    iaMsg.innerText = "IA: Para gerar sensibilidade de 80-200, use o Analyzer V1 ou o Ultra Analyzer VIP se tiver a chave.";
+                } else if(pergunta.includes("vip") || pergunta.includes("727")) {
+                    iaMsg.innerText = "IA: A Zona VIP exige a chave de acesso 727. Nela você obtém protocolos ultra detalhados.";
+                } else if(pergunta.includes("dpi")) {
+                    iaMsg.innerText = "IA: No Painel VIP, você simula sua DPI para receber sugestões de otimização.";
+                } else {
+                    iaMsg.innerText = "IA: Como sua IA de suporte, recomendo testar a sensibilidade no modo treinamento antes de ir ranqueada!";
+                }
+
+                messagesArea.appendChild(iaMsg);
+                messagesArea.scrollTop = messagesArea.scrollHeight; // Rola o chat para baixo automaticamente
+            }, 1000);
+        }
+
+        // Permite enviar mensagem com a tecla Enter
+        document.getElementById('chat-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') enviarMensagem();
+        });
+
+        // 6. Engrenagem de Segurança (Apenas p/ mudar a senha principal)
+        function mudarSenha() {
+            const atual = prompt("DIGITE A SENHA ATUAL (mateus):");
+            if(atual === senhaAdmin) {
+                const nova = prompt("DIGITE A NOVA SENHA:");
+                if(nova) {
+                    senhaAdmin = nova; // Atualiza a senha no código (p/ esta sessão)
+                    alert("SENHA ALTERADA COM SUCESSO! Use esta senha no próximo login.");
+                }
+            } else {
+                alert("SENHA ATUAL INCORRETA! MUDANÇA DE SENHA NEGADA.");
+            }
+        }
+
+    </script>
+</body>
+</html>
